@@ -1,4 +1,5 @@
 from datetime import datetime
+from dateutil.parser import parse
 import os
 
 from azure.cosmosdb.table.tableservice import TableService
@@ -15,23 +16,35 @@ def get_table_service():
 
     return table_service
 
-def query_aq_data(sensor_id,
+def query_aq_data(sensor_id=None,
                   from_date=None,
                   to_date=None,
                   cols=None,
-                  max_rows=None):
+                  max_rows=None,
+                  verbose=False):
     table_service = get_table_service()
+
+    if from_date == to_date and from_date is not None:
+        raise ValueError('from_date and to_date are the same!')
+
+    if type(from_date) is str:
+        from_date = parse(from_date)
+
+    if type(to_date) is str:
+        to_date = parse(to_date)
 
     # Example filter string
     # "RowKey eq 'aq-deployment_nesta-7' and PartitionKey gt '1558530015398' and PartitionKey lt '1558560612372'",
-
-    filter_str = f"RowKey eq '{sensor_id}'"
+    filter_str = None
+    
+    if sensor_id is not None:
+        filter_str = f"RowKey eq '{sensor_id}'"
     
     if from_date is not None:
-        filter_str += f" PartitionKey gt '{datetime_to_pk(from_date)}'"
+        filter_str += f" and PartitionKey gt '{datetime_to_pk(from_date)}'"
     
     if to_date is not None:
-        filter_str += f" PartitionKey lt '{datetime_to_pk(to_date)}'"
+        filter_str += f" and PartitionKey lt '{datetime_to_pk(to_date)}'"
 
     if cols is None:
         selected_cols = None
@@ -40,7 +53,8 @@ def query_aq_data(sensor_id,
         cols.insert(0, 'RowKey')
         selected_cols = ",".join(cols)
 
-    print(filter_str)
+    if verbose:
+        print(filter_str)
 
     results = table_service.query_entities('PublicData',
                                            filter=filter_str,
@@ -48,9 +62,26 @@ def query_aq_data(sensor_id,
                                            num_results=max_rows)
     
     df = pd.DataFrame(results)
+
+    if len(df) == 0:
+        raise ValueError('No results returned')
+
+    # Convert from unix timestamp (in ms) to actual datetime
     df['PartitionKey'] = pk_to_datetime(df['PartitionKey'])
+
+    # We never use the weird etag col, so drop it
     df = df.drop('etag', axis=1)
-    df = df.set_index('PartitionKey')
+
+    df = df.rename(columns={'RowKey':'sensor_id',
+                            'PartitionKey': 'timestamp'})
+    df = df.set_index('timestamp')
+
+    # Convert all columns except the sensor ID to floating point values
+    columns = list(df.columns)
+    columns.remove('sensor_id')
+
+    for column in columns:
+        df[column] = df[column].astype(float)
 
     return df
 
