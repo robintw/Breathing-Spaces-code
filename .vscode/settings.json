@@ -1,0 +1,6 @@
+{
+    "python.pythonPath": "/Users/robin/anaconda3/envs/breathingspaces/bin/python",
+    "python.linting.flake8Enabled": false,
+    "python.linting.enabled": true,
+    "python.linting.pylintEnabled": true
+}

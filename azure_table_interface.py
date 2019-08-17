@@ -22,6 +22,27 @@ def query_aq_data(sensor_id=None,
                   cols=None,
                   max_rows=None,
                   verbose=False):
+    """
+    Queries air quality data from the Azure table managed by Steven Johnston. Data can be selected by sensor_id
+    (default is to include all sensors) and filtered by date range. The returned data can be limited to specific
+    columns and/or a maximum number of rows.
+
+    Parameters:
+     - `sensor_id`: The ID of the sensor to return data for. Must be in the format it is stored in the Azure
+     table, such as 'aq-deployment_nesta-4' not just 'nesta-4'. If None then don't filter by sensor_id
+     - `from_date`: Filter the data to only data recorded after this date. Can be a datetime instance or a
+     a string (which will be passed to 'dateutil.parser.parse'). Note that giving a string date with no time
+     information (eg. '2019-07-01') will be interpreted as midnight on that day.
+     - `to_date`: Filter the data to only data recorded before this date. Can be a datetime instance or a
+     a string (which will be passed to 'dateutil.parser.parse'). Note that giving a string date with no time
+     information (eg. '2019-07-01') will be interpreted as midnight on that day.
+     - `cols`: A list of specific columns to return. If None then returns all columns.
+     - `max_rows`: The maximum number of rows to return. If None then returns all rows.
+     - `verbose`: If True prints out useful debugging information such as the generated query
+
+    Returns:
+    A pandas DataFrame containing the queried data
+    """
     table_service = get_table_service()
 
     if from_date == to_date and from_date is not None:
@@ -39,6 +60,8 @@ def query_aq_data(sensor_id=None,
     
     if sensor_id is not None:
         filter_str = f"RowKey eq '{sensor_id}'"
+    else:
+        filter_str = "RowKey ne '0'"
     
     if from_date is not None:
         filter_str += f" and PartitionKey gt '{datetime_to_pk(from_date)}'"
