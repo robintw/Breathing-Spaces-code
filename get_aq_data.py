@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 from joblib import Memory
 from azure_table_interface import query_aq_data
@@ -38,13 +39,15 @@ def get_all_sensor_data(col='pm25'):
     # after -2 failed. Just combine the two columns as one
     data['nesta-2'] = data['nesta-2'].combine_first(data['nesta-2-1'])
     del data['nesta-2-1']
+
+    data.loc['2019-06-07','nesta-1'] = np.nan
     
     hourly_mean = data.resample('1H').mean()
     daily_mean = data.resample('1D').mean()
     
     return data, hourly_mean, daily_mean
 
-def read_flo_csv(col='pm25'):
+def get_flo_data(col='pm25'):
     col_to_select = col + "_mean"
 
     flo_data = pd.read_csv('../Data/BS Sensors/20190307 to 20190823_15min averages_StDenys_6sensors.csv',
@@ -59,6 +62,8 @@ def read_flo_csv(col='pm25'):
 
     flo_data['nesta-2'] = flo_data['nesta-2'].combine_first(flo_data['nesta-2-1'])
     del flo_data['nesta-2-1']
+
+    flo_data.loc['2019-06-07','nesta-1'] = np.nan
 
     hourly_mean = flo_data.resample('1H').mean()
     daily_mean = flo_data.resample('1D').mean()
