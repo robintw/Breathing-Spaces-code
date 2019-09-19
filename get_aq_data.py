@@ -2,6 +2,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from joblib import Memory
+
+import datetime
+
 from azure_table_interface import query_aq_data
 
 # Set up caching for the Azure table access
@@ -15,6 +18,8 @@ ID_to_name = {'nesta-1': 'Priory Rd (South)',
               'nesta-6': 'Portswood Rd',
               'nesta-7': 'St Denys Rd',
               'nesta-8': 'Priory Rd-Kent Rd junction'}
+
+TICKS_TWO_HOURLY = [datetime.time(hour, 0) for hour in range(0, 24, 2)]
 
 @memory.cache
 def get_sensor_data(sensor_id, **kwargs):
