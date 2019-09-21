@@ -74,3 +74,16 @@ def get_flo_data(col='pm25'):
     daily_mean = flo_data.resample('1D').mean()
     
     return flo_data, hourly_mean, daily_mean
+
+def annotate_boxplot(bpdict, annotate_params=None,
+                     x_offset=0.05, x_loc=0,
+                     text_offset_x=35,
+                     text_offset_y=20):
+    if annotate_params is None:
+        annotate_params = dict(xytext=(text_offset_x, text_offset_y), textcoords='offset points', arrowprops={'arrowstyle':'->'})
+
+    plt.annotate('Median', (x_loc + 1 + x_offset, bpdict['medians'][x_loc].get_ydata()[0]), **annotate_params)
+    plt.annotate('25%', (x_loc + 1 + x_offset, bpdict['boxes'][x_loc].get_ydata()[0]), **annotate_params)
+    plt.annotate('75%', (x_loc + 1 + x_offset, bpdict['boxes'][x_loc].get_ydata()[2]), **annotate_params)
+    plt.annotate('5%', (x_loc + 1 + x_offset, bpdict['caps'][x_loc*2].get_ydata()[0]), **annotate_params)
+    plt.annotate('95%', (x_loc + 1 + x_offset, bpdict['caps'][(x_loc*2)+1].get_ydata()[0]), **annotate_params)
