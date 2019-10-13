@@ -79,6 +79,21 @@ def annotate_boxplot(bpdict, annotate_params=None,
                      x_offset=0.05, x_loc=0,
                      text_offset_x=35,
                      text_offset_y=20):
+    """Annotates a matplotlib boxplot with labels marking minimum, maximum and various centile
+    levels.
+
+    Parameters:
+    - bpdict: The dict returned from the matplotlib `boxplot` function. If you're using pandas you can
+    get this dict by setting `return_type='dict'` when calling `df.boxplot()`.
+    - annotate_params: Extra parameters for the plt.annotate function. The default setting uses standard arrows
+    and offsets the text based on other parameters passed to the function
+    - x_offset: The offset from the centre of the boxplot to place the heads of the arrows, in x axis
+    units (normally just 0-n for n boxplots). Values between around -0.15 and 0.15 seem to work well
+    - x_loc: The x axis location of the boxplot to annotate. Usually just the number of the boxplot, counting
+    from the left and starting at zero.
+    text_offset_x: The x offset from the arrow head location to place the associated text, in 'figure points' units
+    text_offset_y: The y offset from the arrow head location to place the associated text, in 'figure points' units
+    """
     if annotate_params is None:
         annotate_params = dict(xytext=(text_offset_x, text_offset_y), textcoords='offset points', arrowprops={'arrowstyle':'->'})
 
