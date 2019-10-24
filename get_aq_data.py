@@ -17,7 +17,8 @@ ID_to_name = {'nesta-1': 'Priory Rd (South)',
               'nesta-5': 'Kent Rd',
               'nesta-6': 'Portswood Rd',
               'nesta-7': 'St Denys Rd',
-              'nesta-8': 'Priory Rd-Kent Rd junction'}
+              'nesta-8': 'Priory Rd-Kent Rd junction',
+              'nesta-9': 'Riverside'}
 
 TICKS_TWO_HOURLY = [datetime.time(hour, 0) for hour in range(0, 24, 2)]
 
