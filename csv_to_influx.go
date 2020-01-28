@@ -1,3 +1,5 @@
+// Taken from https://github.com/jpillora/csv-to-influxdb, licensed under the MIT license
+
 package main
 
 import (
