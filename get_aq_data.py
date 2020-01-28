@@ -18,7 +18,9 @@ ID_to_name = {'nesta-1': 'Priory Rd (South)',
               'nesta-6': 'Portswood Rd',
               'nesta-7': 'St Denys Rd',
               'nesta-8': 'Priory Rd-Kent Rd junction',
-              'nesta-9': 'Riverside'}
+              'nesta-9': 'Riverside',
+              'nesta-11': 'St Denys Church',
+              'nesta-12': 'Hillside Ave'}
 
 TICKS_TWO_HOURLY = [datetime.time(hour, 0) for hour in range(0, 24, 2)]
 
@@ -34,10 +36,10 @@ def get_sensor_data(sensor_id, **kwargs):
     
     return res
 
-def get_all_sensor_data(col='pm25'):
-    sensor_ids = ['aq-deployment_nesta-' + s for s in ['1', '2', '2-1', '4', '5', '6', '7', '8']]
+def get_all_sensor_data(col='pm25', from_date='2019-01-01'):
+    sensor_ids = ['aq-deployment_nesta-' + s for s in ['1', '2', '2-1', '4', '5', '6', '7', '8', '9']]
     
-    dfs = [get_sensor_data(sensor_id, from_date='2019-01-01', cols=[col]) for sensor_id in sensor_ids]
+    dfs = [get_sensor_data(sensor_id, from_date=from_date, cols=[col]) for sensor_id in sensor_ids]
     
     data = pd.concat(dfs, axis=1)
     
