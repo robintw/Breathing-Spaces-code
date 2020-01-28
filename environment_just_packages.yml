@@ -1,0 +1,25 @@
+name: breathingspaces
+channels:
+  - conda-forge
+  - robintw
+  - defaults
+dependencies:
+  - matplotlib
+  - shapely
+  - numpy
+  - rasterio
+  - gdal
+  - bokeh
+  - hvplot
+  - python=3
+  - jupyter
+  - pandas
+  - phantomjs
+  - xlrd
+  - plotly=4.1.0
+  - missingno
+  - scikit-learn
+  - openpyxl
+  - jupyterlab=1.1
+prefix: /Users/robin/anaconda3/envs/breathingspaces
+
