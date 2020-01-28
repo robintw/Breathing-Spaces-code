@@ -33,7 +33,7 @@ One piece of code is written in the Go language, and this is used to import back
  1. Install Go from https://golang.org/
  2. Put `csv_to_influx.go` somewhere inside your `$GOPATH`
  3. Change to the directory containing `csv_to_influx.go` and run `go get .`
- 4. To run the code, run `go run csv_to_influx.go`
+ 4. To run the code, run `go run csv_to_influx.go` with the relevant command-line arguments (see notes below)
 
 ## Repository contents
 
@@ -45,4 +45,10 @@ One piece of code is written in the Go language, and this is used to import back
 
 ### Importing data
   - `Process back data before ingestion to InfluxDB.ipynb` - processes the back data obtained from Flo ready for importing into InfluxDB. This includes quite a few complex processes, but it is well-documented in the notebook. This produces output files in `../Data/BS Sensors` so make sure this directory exists.
-  - `csv_to_influx.go` - code, written in the Go language, for importing CSV data to InfluxDB while also dealing with null values properly. Taken from https://github.com/jpillora/csv-to-influxdb, licensed under the MIT license.
+  - `csv_to_influx.go` - code, written in the Go language, for importing CSV data to InfluxDB while also dealing with null values properly. Taken from https://github.com/jpillora/csv-to-influxdb, licensed under the MIT license. This code requires lots of command-line arguments to specify which InfluxDB instance to use, authentication methods and columns to use for various purposes. A command like the following should work:
+
+  ```
+  go run csv_to_influx.go --server https://aqdata.uksouth.cloudapp.azure.com:8086 --database aqdata --username USERNAME --password PASSWORD -m ttn -tag-columns dev_id,p_corrected,p_display --timestamp-column timestamp --timestamp-format "unix" --treat-null CSVFILE.csv
+  ```
+
+  This will import `CSVFILE.csv` to the `aqdata` database on the InfluxDB server, importing into the `ttn` measurement with various columns specified as tags, the `timestamp` column specified as a timestamp in unix nanosecond format (Note: That is nanoseconds since Unix epoch, rather than seconds since Unix epoch) and dealing with null values sensibly.
