@@ -20,7 +20,8 @@ ID_to_name = {'nesta-1': 'Priory Rd (South)',
               'nesta-8': 'Priory Rd-Kent Rd junction',
               'nesta-9': 'Riverside',
               'nesta-11': 'St Denys Church',
-              'nesta-12': 'Hillside Ave'}
+              'nesta-12': 'Hillside Ave',
+              'nesta-14': 'Beechwood Junior School'}
 
 TICKS_TWO_HOURLY = [datetime.time(hour, 0) for hour in range(0, 24, 2)]
 
@@ -37,7 +38,8 @@ def get_sensor_data(sensor_id, **kwargs):
     return res
 
 def get_all_sensor_data(col='pm25', from_date='2019-01-01'):
-    sensor_ids = ['aq-deployment_nesta-' + s for s in ['1', '2', '2-1', '4', '5', '6', '7', '8', '9']]
+    sensor_ids = ['aq-deployment_' + k for k in ID_to_name.keys()]
+    print(sensor_ids)
     
     dfs = [get_sensor_data(sensor_id, from_date=from_date, cols=[col]) for sensor_id in sensor_ids]
     
@@ -72,6 +74,35 @@ def get_flo_data(col='pm25'):
     del flo_data['nesta-2-1']
 
     flo_data.loc['2019-06-07','nesta-1'] = np.nan
+
+    hourly_mean = flo_data.resample('1H').mean()
+    daily_mean = flo_data.resample('1D').mean()
+    
+    return flo_data, hourly_mean, daily_mean
+
+def get_flo_data_new():
+    # Reads the latest data from Flo, as of July 2020, which comes in a slightly
+    # different format
+    flo_data = pd.read_csv('../Data/BS Sensors/20200630_data_dump_pm25_15min_pms_sps.csv',
+                           parse_dates=[2], dayfirst=True)
+    flo_data = flo_data.drop('Unnamed: 0', axis=1)
+    flo_data = flo_data[['site', 'date_cut', 'pm25']]
+    flo_data.columns = ['site', 'date', 'pm25']
+
+    flo_data = flo_data.pivot(columns='site', index='date', values='pm25')
+
+    flo_data.columns = [col.lower() for col in flo_data.columns]
+    flo_data.index.name = 'timestamp'
+
+    flo_data['nesta-2'] = flo_data['nesta-2'].combine_first(flo_data['nesta-2-1'])
+    del flo_data['nesta-2-1']
+
+    del flo_data['nesta-3']
+    del flo_data['nesta-13']
+
+    flo_data.loc['2019-06-07','nesta-1'] = np.nan
+
+    flo_data = flo_data.dropna(how='all', axis=0)
 
     hourly_mean = flo_data.resample('1H').mean()
     daily_mean = flo_data.resample('1D').mean()
